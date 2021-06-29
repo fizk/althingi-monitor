@@ -4,7 +4,6 @@ jobs:
 
   build-deploy-init:
     runs-on: ubuntu-latest
-    needs: test
     if: github.ref == 'refs/heads/main'
     steps:
       -
@@ -45,7 +44,6 @@ jobs:
 
   build-deploy-metricbeat:
     runs-on: ubuntu-latest
-    needs: test
     if: github.ref == 'refs/heads/main'
     steps:
       -
@@ -86,7 +84,6 @@ jobs:
 
   build-deploy-filebeat:
     runs-on: ubuntu-latest
-    needs: test
     if: github.ref == 'refs/heads/main'
     steps:
       -
@@ -127,7 +124,6 @@ jobs:
 
   build-deploy-logstash:
     runs-on: ubuntu-latest
-    needs: test
     if: github.ref == 'refs/heads/main'
     steps:
       -
