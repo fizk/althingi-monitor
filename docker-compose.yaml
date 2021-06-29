@@ -1,0 +1,91 @@
+version: '3'
+
+services:
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+        container_name: althingi-logger-elasticsearch
+        environment:
+            - bootstrap.memory_lock=true
+            - discovery.type=single-node
+            - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        # ports:
+        #     - 9200:9200
+        volumes:
+            - elasticsearch-monitor-volume:/usr/share/elasticsearch/data
+        networks:
+            - main-althingi-networks
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.13.2
+        container_name: althingi-logger-kibana
+        environment:
+            ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+        ports:
+            - 8081:5601
+        networks:
+            - main-althingi-networks
+
+    metricbeat:
+        image: docker.elastic.co/beats/metricbeat:7.13.2
+        container_name: althingi-logger-metricbeat
+        user: root
+        depends_on:
+            - elasticsearch
+            - kibana
+        networks:
+            - main-althingi-networks
+        environment:
+            - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601"
+            - "HOST_ELASTICSEARCH=elasticsearch:9200"
+            - "HOST_KIBANA=kibana:5601"
+            - ELASTICSEARCH_HOSTS=elasticsearch:9200
+            # - ELASTICSEARCH_USERNAME
+            # - ELASTICSEARCH_PASSWORD
+            - MYSQL_HOST=source-db
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=example
+            - RABBITMQ_USER=admin
+            - RABBITMQ_PASSWORD=Admin@123
+            - MONGODB_USER=root
+            - MONGODB_PASSWORD=example
+        volumes:
+            # - ./metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    filebeat:
+        image: docker.elastic.co/beats/filebeat:7.13.2
+        user: root
+        container_name: althingi-logger-filebeat
+        environment:
+            - -strict.perms=false
+        networks:
+            - main-althingi-networks
+        volumes:
+            # - ./filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
+            - /var/lib/docker/containers:/var/lib/docker/containers:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    logstash:
+        image: docker.elastic.co/logstash/logstash:7.13.2
+        user: root
+        container_name: althingi-logger-logstash
+        environment:
+            - ELASTICSEARCH_HOSTS=elasticsearch:9200
+        volumes:
+            # - ./logstash.filebeat.pipeline.conf:/usr/share/logstash/pipeline/logstash.filebeat.pipeline.conf
+        networks:
+            - main-althingi-networks
+
+volumes:
+    elasticsearch-monitor-volume:
+        external: true
+
+networks:
+  main-althingi-networks:
+    external: true
+    name: main-althingi-networks

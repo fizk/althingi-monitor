@@ -1,0 +1,18 @@
+FROM debian:stretch-slim
+
+ENV MONITOR_ES=elasticsearch:9200 \
+    SEARCH_ES=elasticsearch:9200
+
+RUN apt-get update -y; \
+    apt-get install curl -y
+
+COPY ./templates-monitor.json /templates-monitor.json
+
+WORKDIR /
+
+RUN echo "#!/bin/sh\n \
+    curl -X DELETE --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/logging_template1\n \
+    curl -XPUT --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/logging_template1 -d '@/templates-monitor.json'" \
+    > /init.sh && chmod +x /init.sh
+
+CMD [ "/init.sh" ]

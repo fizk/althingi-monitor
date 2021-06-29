@@ -1,0 +1,81 @@
+metricbeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    # Reload module configs as they change:
+    reload.enabled: false
+
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      labels.dedot: true
+
+metricbeat.modules:
+- module: docker
+  metricsets:
+    - "container"
+    - "cpu"
+    - "diskio"
+    - "healthcheck"
+    - "info"
+    #- "image"
+    - "memory"
+    - "network"
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
+  enabled: true
+
+- module: mysql
+  metricsets:
+    - status
+    # - query
+    # - galera_status
+    # - performance
+  period: 10s
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(${MYSQL_HOST}:3306)/"]
+
+  # Username of hosts. Empty by default.
+  username: '${MYSQL_USER}'
+
+  # Password of hosts. Empty by default.
+  password: '${MYSQL_PASSWORD}'
+
+  # By setting raw to true, all raw fields from the status metricset will be added to the event.
+  #raw: false
+  enabled: true
+
+- module: rabbitmq
+  metricsets: ["node", "queue", "connection"]
+  enabled: true
+  period: 10s
+  hosts: ["queue:15672"]
+  username: '${RABBITMQ_USER}'
+  password: '${RABBITMQ_PASSWORD}'
+
+- module: apache
+  metricsets: ["status"]
+  period: 10s
+  enabled: true
+
+  # Apache hosts
+  hosts: ["http://client:80"]
+
+- module: mongodb
+  hosts: ["store-db"]
+  enabled: true
+  username: '${MONGODB_USER}'
+  password: '${MONGODB_PASSWORD}'
+
+processors:
+  - add_cloud_metadata: ~
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+  username: '${ELASTICSEARCH_USERNAME:}'
+  password: '${ELASTICSEARCH_PASSWORD:}'

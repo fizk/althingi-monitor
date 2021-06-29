@@ -1,0 +1,70 @@
+{
+    "index_patterns": [
+        "aggregator-*",
+        "source-*",
+        "messages-*"
+    ],
+    "priority": 1,
+    "template": {
+        "settings": {
+            "number_of_shards": 2
+        },
+        "mappings": {
+            "properties": {
+                "@timestamp": {
+                    "type": "date"
+                },
+                "@version": {
+                    "type": "keyword"
+                },
+                "container": {
+                    "type": "nested",
+                    "enabled": false,
+                    "dynamic": true
+                },
+                "error_file": {
+                    "type": "text"
+                },
+                "error_message": {
+                    "type": "text"
+                },
+                "error_trace": {
+                    "type": "nested",
+                    "enabled": false,
+                    "dynamic": true
+                },
+                "level": {
+                    "type": "keyword"
+                },
+                "request_headers": {
+                    "type": "nested",
+                    "enabled": false,
+                    "dynamic": true
+                },
+                "request_method": {
+                    "type": "keyword"
+                },
+                "request_uri": {
+                    "type": "text"
+                },
+                "response_headers": {
+                    "type": "nested",
+                    "dynamic": true,
+                    "enabled": false
+                },
+                "response_status": {
+                    "type": "integer"
+                },
+                "section_name": {
+                    "type": "keyword"
+                },
+                "service": {
+                    "type": "keyword"
+                },
+                "timestamp": {
+                    "type": "date"
+                }
+            }
+        }
+    }
+}
