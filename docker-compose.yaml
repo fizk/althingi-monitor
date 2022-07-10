@@ -3,6 +3,7 @@ version: '3'
 services:
 
     elasticsearch:
+        container_name: local-althingi-monitor-elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
         container_name: althingi-logger-elasticsearch
         environment:
@@ -21,6 +22,7 @@ services:
             - main-althingi-networks
 
     kibana:
+        container_name: local-althingi-monitor-kibana
         image: docker.elastic.co/kibana/kibana:7.13.2
         container_name: althingi-logger-kibana
         environment:
@@ -31,6 +33,7 @@ services:
             - main-althingi-networks
 
     metricbeat:
+        container_name: local-althingi-monitor-metricbeat
         image: docker.elastic.co/beats/metricbeat:7.13.2
         container_name: althingi-logger-metricbeat
         user: root
@@ -58,6 +61,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:ro
 
     filebeat:
+        container_name: local-althingi-monitor-filebeat
         image: docker.elastic.co/beats/filebeat:7.13.2
         user: root
         container_name: althingi-logger-filebeat
@@ -71,6 +75,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:ro
 
     logstash:
+        container_name: local-althingi-monitor-filebeat-logstash
         image: docker.elastic.co/logstash/logstash:7.13.2
         user: root
         container_name: althingi-logger-logstash
