@@ -43,7 +43,6 @@ services:
         # networks:
         #     - main-althingi-networks
         environment:
-            - SOMESTUFF=host.docker.internal
             - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601"
             - "HOST_ELASTICSEARCH=elasticsearch:9200"
             - "HOST_KIBANA=kibana:5601"
