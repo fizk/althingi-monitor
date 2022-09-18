@@ -2,7 +2,7 @@
     "index_patterns": [
         "aggregator-*",
         "source-*",
-        "messages-*"
+        "store-*"
     ],
     "priority": 1,
     "template": {

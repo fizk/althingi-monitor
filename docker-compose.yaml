@@ -5,7 +5,6 @@ services:
     elasticsearch:
         container_name: local-althingi-monitor-elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
-        container_name: althingi-logger-elasticsearch
         environment:
             - bootstrap.memory_lock=true
             - discovery.type=single-node
@@ -14,46 +13,55 @@ services:
             memlock:
                 soft: -1
                 hard: -1
-        # ports:
-        #     - 9200:9200
+        ports:
+            - 9200:9200
         volumes:
             - elasticsearch-monitor-volume:/usr/share/elasticsearch/data
-        networks:
-            - main-althingi-networks
+        # networks:
+        #     - main-althingi-networks
 
     kibana:
         container_name: local-althingi-monitor-kibana
         image: docker.elastic.co/kibana/kibana:7.13.2
-        container_name: althingi-logger-kibana
         environment:
             ELASTICSEARCH_HOSTS: http://elasticsearch:9200
         ports:
             - 8081:5601
-        networks:
-            - main-althingi-networks
+        # networks:
+        #     - main-althingi-networks
 
     metricbeat:
         container_name: local-althingi-monitor-metricbeat
-        image: docker.elastic.co/beats/metricbeat:7.13.2
-        container_name: althingi-logger-metricbeat
+        # image: docker.elastic.co/beats/metricbeat:7.13.2
+        build:
+            context: .
+            dockerfile: Dockerfile.metricbeat
         user: root
         depends_on:
             - elasticsearch
             - kibana
-        networks:
-            - main-althingi-networks
+        # networks:
+        #     - main-althingi-networks
         environment:
+            - SOMESTUFF=host.docker.internal
             - "WAIT_FOR_HOSTS=elasticsearch:9200 kibana:5601"
             - "HOST_ELASTICSEARCH=elasticsearch:9200"
             - "HOST_KIBANA=kibana:5601"
             - ELASTICSEARCH_HOSTS=elasticsearch:9200
+            - LOGSTASH_HOST=logstash
+            # - LOGSTASH_HOST=host.docker.internal
+            - LOGSTASH_PORT=5044
             # - ELASTICSEARCH_USERNAME
             # - ELASTICSEARCH_PASSWORD
-            - MYSQL_HOST=source-db
+            - MYSQL_HOST=host.docker.internal #source-db
             - MYSQL_USER=root
             - MYSQL_PASSWORD=example
-            - RABBITMQ_USER=admin
-            - RABBITMQ_PASSWORD=Admin@123
+            - KAFKA_HOST=host.docker.internal
+            - KAFKA_PORT=9092
+            - CLIENT_HOST=host.docker.internal
+            - CLIENT_PORT=8282
+            - MONGODB_HOST=host.docker.internal
+            - MONGODB_PORT=27017
             - MONGODB_USER=root
             - MONGODB_PASSWORD=example
         volumes:
@@ -62,13 +70,15 @@ services:
 
     filebeat:
         container_name: local-althingi-monitor-filebeat
-        image: docker.elastic.co/beats/filebeat:7.13.2
+        # image: docker.elastic.co/beats/filebeat:7.13.2
+        build:
+            context: .
+            dockerfile: Dockerfile.filebeat
         user: root
-        container_name: althingi-logger-filebeat
         environment:
             - -strict.perms=false
-        networks:
-            - main-althingi-networks
+        # networks:
+        #     - main-althingi-networks
         volumes:
             # - ./filebeat.docker.yml:/usr/share/filebeat/filebeat.yml
             - /var/lib/docker/containers:/var/lib/docker/containers:ro
@@ -76,19 +86,21 @@ services:
 
     logstash:
         container_name: local-althingi-monitor-filebeat-logstash
-        image: docker.elastic.co/logstash/logstash:7.13.2
+        # image: docker.elastic.co/logstash/logstash:7.13.2
+        build:
+            context: .
+            dockerfile: Dockerfile.logstash
         user: root
-        container_name: althingi-logger-logstash
         environment:
             - ELASTICSEARCH_HOSTS=elasticsearch:9200
-        volumes:
-            # - ./logstash.filebeat.pipeline.conf:/usr/share/logstash/pipeline/logstash.filebeat.pipeline.conf
-        networks:
-            - main-althingi-networks
+        # volumes:
+        #     - ./logstash.filebeat.pipeline.conf:/usr/share/logstash/pipeline/logstash.conf
+        # networks:
+        #     - main-althingi-networks
 
 volumes:
     elasticsearch-monitor-volume:
-        external: true
+        # external: true
 
 networks:
   main-althingi-networks:

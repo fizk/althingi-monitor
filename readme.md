@@ -28,8 +28,10 @@ docker compose up elasticsearch kibana metricbeat filebeat logstash -d
 Now the monitor system is up and running, but Kibana does not have the required dashboards and search indexes. Do do that, the _metricbeat setup_ process has to be run. For it to run within the correct network, the docker-compose file is used.
 
 ```sh
-docker compose run metricbeat bash -c "metricbeat setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=[\"elasticsearch:9200\"]"
+docker compose run --rm metricbeat bash -c "metricbeat setup -E setup.kibana.host=kibana:5601 -E output.elasticsearch.hosts=[\"elasticsearch:9200\"]"
 ```
+
+You might need to wait a bit until Elastic comes on line. So if it says that Elasticsearch can't be connected to, just wait and then retry.
 
 Update network names and ports accordingly.
 
@@ -45,7 +47,9 @@ When this docker-image is built, it wil copy the payload required to run the cUR
 Because the shell-script is going to connect to a remote server/service (in this case the Elasticsearch cluster), it needs to know where to locate server. Pass in a environment variable to set Elasticsearch host and port, for example:
 
 ```sh
-docker run -it -e MONITOR_ES=elasticsearch:9200 <docker-image-name>
+docker build -f Dockerfile.init -t search-init .
+docker run -it -e MONITOR_ES=elasticsearch:9200 search-init
+docker run -it -e MONITOR_ES=host.docker.internal:9200 search-init
 ```
 
 | VAR        | TYPE           | DEFAULT             | DESCRIPTION                                                    |

@@ -11,8 +11,10 @@ COPY ./templates-monitor.json /templates-monitor.json
 WORKDIR /
 
 RUN echo "#!/bin/sh\n \
-    curl -X DELETE --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/logging_template1\n \
-    curl -XPUT --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/logging_template1 -d '@/templates-monitor.json'" \
+    curl -X DELETE --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/content-services\n \
+    curl -XPUT --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/content-services -d '@/template.content-services' \
+    curl -X DELETE --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/message-services\n \
+    curl -XPUT --header 'Content-Type: application/json' http://\$MONITOR_ES/_index_template/message-services -d '@/template.message-services'" \
     > /init.sh && chmod +x /init.sh
 
 CMD [ "/init.sh" ]

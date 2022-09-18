@@ -23,8 +23,10 @@ processors:
       - not.equals:
           container.labels.althingi_service: "server"
       - not.equals:
-          container.labels.althingi_service: "messages"
+          container.labels.althingi_service: "messages-source"
+      - not.equals:
+          container.labels.althingi_service: "messages-search"
 
 
 output.logstash:
-  hosts: ["logstash:5044"]
+  hosts: ["${LOGSTASH_HOST:logstash}:${LOGSTASH_PORT:5044}"]

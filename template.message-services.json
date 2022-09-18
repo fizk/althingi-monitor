@@ -1,0 +1,66 @@
+{
+    "index_patterns": [
+        "messages-source-*",
+        "messages-search-*"
+    ],
+    "priority": 1,
+    "template": {
+        "settings": {
+            "number_of_shards": 2
+        },
+        "mappings": {
+            "properties": {
+                "@timestamp": {
+                    "type": "date"
+                },
+                "@version": {
+                    "type": "keyword"
+                },
+                "container": {
+                    "type": "nested",
+                    "enabled": false,
+                    "dynamic": true
+                },
+                "level": {
+                    "type": "keyword"
+                },
+                "timestamp": {
+                    "type": "date"
+                },
+
+                "error": {
+                    "type": "text"
+                },
+                "error_location": {
+                    "type": "text"
+                },
+                "error_stack": {
+                    "type": "text"
+                },
+                "extra": {
+                    "type": "nested",
+                    "enabled": false,
+                    "dynamic": true
+                },
+                "message": {
+                    "type": "text"
+                },
+                "namespace": {
+                    "type": "keyword"
+                },
+                "request_method": {
+                    "type": "keyword"
+                },
+                "request_url": {
+                    "type": "text"
+                },
+                "response_status": {
+                    "type": "integer"
+                },
+                "topic": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+}
